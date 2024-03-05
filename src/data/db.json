@@ -1,0 +1,49 @@
+{
+  "persons": [
+    {
+      "id": "86767a5f-4a5b-4543-bea2-a604345y0075",
+      "name": "Milan",
+      "surname": "Petrović",
+      "userType": "regular",
+      "createdDate": "2024-02-22",
+      "city": "Beograd",
+      "address": "Prvomajska 5"
+    },
+    {
+      "id": "86767a5f-3a5b-4555-bea2-a604392c0075",
+      "name": "Jovana",
+      "surname": "Marković",
+      "userType": "admin",
+      "createdDate": "2024-02-22",
+      "city": "Novi Sad",
+      "address": "Trg slobode 10"
+    },
+    {
+      "id": "23378a5f-3a5b-4543-bea2-a604392c0075",
+      "name": "Stefan",
+      "surname": "Nikolić",
+      "userType": "regular",
+      "createdDate": "2024-02-22",
+      "city": "Niš",
+      "address": "Cara Dušana 22"
+    },
+    {
+      "id": "86767a5f-4g5b-4543-bea2-a604392c0075",
+      "name": "Ana",
+      "surname": "Jovanović",
+      "userType": "regular",
+      "createdDate": "2024-02-22",
+      "city": "Kragujevac",
+      "address": "Kralja Petra I 17"
+    },
+    {
+      "id": "86767a5f-3a5b-5555-bea2-a604392c0075",
+      "name": "Nikola",
+      "surname": "Ivanović",
+      "userType": "regular",
+      "createdDate": "2024-02-22",
+      "city": "Subotica",
+      "address": "Trg republike 7"
+    }
+  ]
+}
