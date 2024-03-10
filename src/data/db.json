@@ -1,33 +1,6 @@
 {
   "persons": [
     {
-      "id": "86767a5f-4a5b-4543-bea2-a604345y0075",
-      "name": "Milan",
-      "surname": "Petrović",
-      "userType": "regular",
-      "createdDate": "2024-02-22",
-      "city": "Beograd",
-      "address": "Prvomajska 5"
-    },
-    {
-      "id": "86767a5f-3a5b-4555-bea2-a604392c0075",
-      "name": "Jovana",
-      "surname": "Marković",
-      "userType": "admin",
-      "createdDate": "2024-02-22",
-      "city": "Novi Sad",
-      "address": "Trg slobode 10"
-    },
-    {
-      "id": "23378a5f-3a5b-4543-bea2-a604392c0075",
-      "name": "Stefan",
-      "surname": "Nikolić",
-      "userType": "regular",
-      "createdDate": "2024-02-22",
-      "city": "Niš",
-      "address": "Cara Dušana 22"
-    },
-    {
       "id": "86767a5f-4g5b-4543-bea2-a604392c0075",
       "name": "Ana",
       "surname": "Jovanović",
@@ -44,6 +17,42 @@
       "createdDate": "2024-02-22",
       "city": "Subotica",
       "address": "Trg republike 7"
+    },
+    {
+      "id": "3da9736b-9fc1-555b-a557-12f043ff6d1f",
+      "name": "Arsebuhe",
+      "surname": "Rankovic",
+      "userType": "regular",
+      "createdDate": "2024-03-12",
+      "city": "Beograd",
+      "address": "gospodara"
+    },
+    {
+      "id": "3da9736b-3fc1-411b-a627-12f043ff6d1f",
+      "name": "Marko",
+      "surname": "Markovic",
+      "userType": "admin",
+      "createdDate": "2023-01-24",
+      "city": "Beograd",
+      "address": "Kneza Milosa"
+    },
+    {
+      "id": "3da9736b-9fc1-413b-a627-12f043ff6f5",
+      "name": "Nemanja",
+      "surname": "Jokic",
+      "userType": "regular",
+      "createdDate": "2023-02-23",
+      "city": "Beograd",
+      "address": "Krunska"
+    },
+    {
+      "id": "3da9736b-9fc1-413b-a627-12f043ff6d1f",
+      "name": "Stefan",
+      "surname": "Stefanovic",
+      "userType": "regular",
+      "createdDate": "2023-05-05",
+      "city": "Beograd",
+      "address": "Resavski"
     }
   ]
 }

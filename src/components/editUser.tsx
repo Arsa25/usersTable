@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useMemo, useState } from "react";
 import {
   ActionButton,
   IIconProps,
@@ -6,10 +6,8 @@ import {
   IconButton,
   getTheme,
 } from "@fluentui/react";
-import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-const theme = getTheme();
 type User = {
   id: string;
   name: string;
@@ -19,7 +17,6 @@ type User = {
   city: string;
   address: string;
 };
-type UsersArray = User[];
 
 const iconButtonStyles = {
   root: {
@@ -27,53 +24,41 @@ const iconButtonStyles = {
     marginRight: "2px",
   },
 };
-const addFriendIcon: IIconProps = { iconName: "AddFriend" };
-//createUser
+const addFriendIcon: IIconProps = { iconName: "Edit" };
 
-interface CreateUserProps {
+interface EditUserProps {
+  editProps: User;
   fetchAllUsers: () => void;
 }
+
 //komponenta
-const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
+const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
   type IButtonProps = {
     disabled?: boolean;
     checked?: boolean;
   };
 
   const props: IButtonProps = { disabled: false, checked: false };
-  const [user, setUser] = useState({
-    id: "",
-    name: "",
-    surname: "",
-    userType: "",
-    createdDate: "",
-    city: "",
-    address: "",
-  });
 
-  const requestOptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(user),
-  };
+  const [user, setUser] = useState({
+    id: editProps.id,
+    name: editProps.name,
+    surname: editProps.surname,
+    userType: editProps.userType,
+    createdDate: editProps.createdDate,
+    city: editProps.city,
+    address: editProps.address,
+  });
 
   //modal
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  const createUser = (e: any) => {
+  const editUser = (e: any) => {
     e.preventDefault();
 
-    const userId = uuidv4();
-    setUser({ ...user, id: userId });
-    console.log(userId);
-
     if (
-      user.id !== "" &&
       user.name !== "" &&
       user.surname !== "" &&
       user.userType !== "" &&
@@ -81,23 +66,18 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
       user.city !== "" &&
       user.address !== ""
     ) {
-      //fetch
-      fetch("http://localhost:3000/persons", requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Post je uspešno kreiran:", data);
-        })
-        .catch((error) => {
-          console.error(
-            "Došlo je do greške prilikom slanja POST zahteva:",
-            error
-          );
-        });
+      //fetchById
+      fetch(`http://localhost:3000/persons/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      })
+        .then((response) => response.json())
+        .then((data) => console.log(data))
+        .catch((error) => console.error("Error updating data:", error));
+
       closeModal();
       fetchAllUsers();
     }
@@ -111,11 +91,11 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
         disabled={props.disabled}
         checked={props.checked}
       >
-        Create user
+        Edit user
       </ActionButton>
       <Modal isOpen={isOpen} onDismiss={closeModal} isBlocking={false}>
         <span style={{ display: "flex", justifyContent: "space-between" }}>
-          <h2>Create user</h2>
+          <h2>Edit user</h2>
           <IconButton
             iconProps={{ iconName: "Cancel" }}
             ariaLabel="Close modal"
@@ -124,12 +104,13 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
           />
         </span>
         <div className="containerEmployeeAdd">
-          <form className="addUser" onSubmit={createUser}>
+          <form className="addUser" onSubmit={editUser}>
             <input
               type="text"
               placeholder="Unesite ime"
               className="input input-ime"
               required={true}
+              value={user.name}
               onChange={(e) => setUser({ ...user, name: e.target.value })}
             />
             <input
@@ -137,6 +118,7 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
               placeholder="Unesite prezime"
               className="input input-prezime"
               required={true}
+              value={user.surname}
               onChange={(e) => setUser({ ...user, surname: e.target.value })}
             />
             <input
@@ -144,6 +126,7 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
               placeholder="Unesite tip korisnika"
               className="input input-adrtesa"
               required={true}
+              value={user.userType}
               onChange={(e) => setUser({ ...user, userType: e.target.value })}
             />
             <input
@@ -151,6 +134,7 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
               placeholder="Unesite datum kreiranja"
               className="input input-email"
               required={true}
+              value={user.createdDate}
               onChange={(e) =>
                 setUser({ ...user, createdDate: e.target.value })
               }
@@ -160,6 +144,7 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
               placeholder="Unesite grad"
               className="input input-phone"
               required={true}
+              value={user.city}
               onChange={(e) => setUser({ ...user, city: e.target.value })}
             />
             <input
@@ -167,6 +152,7 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
               placeholder="Unesite adresu"
               className="input input-vrtic"
               required={true}
+              value={user.address}
               onChange={(e) => setUser({ ...user, address: e.target.value })}
             />
 
@@ -177,4 +163,4 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
     </>
   );
 };
-export default CreateUser;
+export default EditUser;
