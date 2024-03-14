@@ -21,7 +21,7 @@
     {
       "id": "3da9736b-9fc1-555b-a557-12f043ff6d1f",
       "name": "Arsebuhe",
-      "surname": "Rankovic",
+      "surname": "Ranković",
       "userType": "regular",
       "createdDate": "2024-03-12",
       "city": "Beograd",
@@ -44,15 +44,6 @@
       "createdDate": "2023-02-23",
       "city": "Beograd",
       "address": "Krunska"
-    },
-    {
-      "id": "3da9736b-9fc1-413b-a627-12f043ff6d1f",
-      "name": "Stefan",
-      "surname": "Stefanovic",
-      "userType": "regular",
-      "createdDate": "2023-05-05",
-      "city": "Beograd",
-      "address": "Resavski"
     }
   ]
 }

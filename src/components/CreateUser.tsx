@@ -139,13 +139,19 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
               required={true}
               onChange={(e) => setUser({ ...user, surname: e.target.value })}
             />
-            <input
+            <span>
+              <select required={true} name="userType" id="userType" onChange={(e) => setUser({ ...user, userType: e.target.value})}>
+                <option value="regular">regular</option>
+                <option value="admin">admin</option>
+              </select>
+            </span>
+            {/* <input
               type="text"
               placeholder="Unesite tip korisnika"
               className="input input-adrtesa"
               required={true}
               onChange={(e) => setUser({ ...user, userType: e.target.value })}
-            />
+            /> */}
             <input
               type="date"
               placeholder="Unesite datum kreiranja"

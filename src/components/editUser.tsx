@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState,useRef } from "react";
 import {
   ActionButton,
   IIconProps,
@@ -6,7 +6,6 @@ import {
   IconButton,
   getTheme,
 } from "@fluentui/react";
-import { v4 as uuidv4 } from "uuid";
 
 type User = {
   id: string;
@@ -32,13 +31,14 @@ interface EditUserProps {
 }
 
 //komponenta
-const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
+const EditUser: FC<EditUserProps> = ({ editProps, fetchAllUsers }) => {
   type IButtonProps = {
     disabled?: boolean;
     checked?: boolean;
   };
-
   const props: IButtonProps = { disabled: false, checked: false };
+
+  const modal = document.querySelector(".modal") as HTMLDivElement
 
   const [user, setUser] = useState({
     id: editProps.id,
@@ -49,14 +49,40 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
     city: editProps.city,
     address: editProps.address,
   });
+  const [originalUserCopy, setOriginalUserCopy] = useState<User>()
+  useMemo(() => { setOriginalUserCopy(user) }, [])
+
 
   //modal
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const openModal = () => setIsOpen(true);
+  const openModal = () => {
+    setIsOpen(true)
+    setTimeout(() => {
+      hendleButtonDisabled()
+    }, 500)
+  };
   const closeModal = () => setIsOpen(false);
 
-  const editUser = (e: any) => {
-    e.preventDefault();
+
+  //disable button
+  useEffect(() => {
+    hendleButtonDisabled();
+  }, [user]);
+  const hendleButtonDisabled = () => {
+    const button = document.querySelector(".submitUser") as HTMLButtonElement
+    if (button) {
+      const hendleChange = user.name !== originalUserCopy?.name ||
+        user.surname !== originalUserCopy.surname ||
+        user.userType !== originalUserCopy.userType ||
+        user.createdDate !== originalUserCopy.createdDate ||
+        user.city !== originalUserCopy.city ||
+        user.address !== originalUserCopy.address
+      button.disabled = !hendleChange
+    }
+
+  }
+
+  const editUser = () => {
 
     if (
       user.name !== "" &&
@@ -66,6 +92,7 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
       user.city !== "" &&
       user.address !== ""
     ) {
+
       //fetchById
       fetch(`http://localhost:3000/persons/${user.id}`, {
         method: "PUT",
@@ -76,12 +103,35 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
       })
         .then((response) => response.json())
         .then((data) => console.log(data))
-        .catch((error) => console.error("Error updating data:", error));
-
-      closeModal();
-      fetchAllUsers();
+        .catch((error) => console.error("Error updating data:", error))
+        .finally(() => {
+          closeModal()
+          fetchAllUsers()
+        });
     }
-  };
+  }
+ 
+  // //custom modal
+
+  //  // **Custom modal state controlled by useRef**
+  //  const isCustomModalOpenRef = useRef<boolean>(false);
+  
+
+  // // **Open custom modal controlled by useRef**
+  // const openCustomModal = () => {
+  //   isCustomModalOpenRef.current = true;
+  // };
+
+  // // **Close custom modal controlled by useRef**
+  // const closeCustomModal = () => {
+  //   isCustomModalOpenRef.current = false;
+  // };
+  // const customModalComponent =
+  //   isCustomModalOpenRef.current && createPortal(
+  //     <CustomModal closeModal={closeCustomModal} />,
+  //     document.body
+  //   );
+
   return (
     <>
       <ActionButton
@@ -111,7 +161,9 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
               className="input input-ime"
               required={true}
               value={user.name}
-              onChange={(e) => setUser({ ...user, name: e.target.value })}
+              onChange={(e) => {
+                setUser({ ...user, name: e.target.value })
+              }}
             />
             <input
               type="text"
@@ -119,7 +171,9 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
               className="input input-prezime"
               required={true}
               value={user.surname}
-              onChange={(e) => setUser({ ...user, surname: e.target.value })}
+              onChange={(e) => {
+                setUser({ ...user, surname: e.target.value })
+              }}
             />
             <input
               type="text"
@@ -127,7 +181,9 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
               className="input input-adrtesa"
               required={true}
               value={user.userType}
-              onChange={(e) => setUser({ ...user, userType: e.target.value })}
+              onChange={(e) => {
+                setUser({ ...user, userType: e.target.value })
+              }}
             />
             <input
               type="date"
@@ -135,8 +191,9 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
               className="input input-email"
               required={true}
               value={user.createdDate}
-              onChange={(e) =>
+              onChange={(e) => {
                 setUser({ ...user, createdDate: e.target.value })
+              }
               }
             />
             <input
@@ -145,7 +202,9 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
               className="input input-phone"
               required={true}
               value={user.city}
-              onChange={(e) => setUser({ ...user, city: e.target.value })}
+              onChange={(e) => {
+                setUser({ ...user, city: e.target.value })
+              }}
             />
             <input
               type="text"
@@ -153,14 +212,17 @@ const EditUser: FC<EditUserProps> = ({ editProps,fetchAllUsers }) => {
               className="input input-vrtic"
               required={true}
               value={user.address}
-              onChange={(e) => setUser({ ...user, address: e.target.value })}
+              onChange={(e) => {
+                setUser({ ...user, address: e.target.value })
+              }}
             />
 
-            <input type="submit" placeholder="Submit" className="submitUser" />
+            <button type="submit" className="submitUser">Submit</button>
           </form>
         </div>
-      </Modal>
+      </Modal>      
     </>
-  );
-};
-export default EditUser;
+  )
+}
+
+export default EditUser

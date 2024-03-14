@@ -76,7 +76,7 @@ const deleteButtonStyles: Partial<IButtonStyles> = {
     backgroundColor: "red",
     fontSize: "1.1rem",
     border: "none",
-    marginLeft: "1px",
+    margin: "0 30px 0 auto",
   },
 };
 
@@ -153,7 +153,7 @@ const Tablee: FC = () => {
             type="checkbox"
             onChange={(event) => handleCheckboxChange(user.id, event)}
           />
-          <EditUser editProps={user} fetchAllUsers={fetchAllUsers}/>
+          <EditUser editProps={user} fetchAllUsers={fetchAllUsers} />
         </TableCellLayout>
       </TableCell>
     </TableRow>
@@ -174,20 +174,28 @@ const Tablee: FC = () => {
     if (isChecked || !isHere) {
       setCheckedRows([...checkedRows, id]);
     } else if (isChecked && isHere) {
-      setCheckedRows( checkedRows.filter((id) => id !== id));
+      setCheckedRows(checkedRows.filter((id) => id !== id));
     }
   };
   //delete
 
-  const deleteUsers = (arrId:Array<string>) => {
-    
-    arrId.map((id) => {
-      fetch(`http://localhost:3000/persons/${id}`, {
-        method: "DELETE",
-      });
-    });
+  const deleteUsers = (arrId: Array<string>) => {
+    if (arrId.length !== 0) {
 
+      if (window.confirm("Da li ste sigurni")) {
+
+        arrId.map((id) => {
+          fetch(`http://localhost:3000/persons/${id}`, {
+            method: "DELETE",
+          });
+        });
+      }
+    } else {
+      alert("Niste selektovali korisnika")
+
+    }
   }
+
 
   return (
     <>
