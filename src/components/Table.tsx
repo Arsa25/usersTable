@@ -27,6 +27,7 @@ import {
 } from "@fluentui/react";
 import CreateUser from "./CreateUser";
 import EditUser from "./editUser";
+import { isForInStatement } from "typescript";
 
 type User = {
   id: string;
@@ -76,7 +77,7 @@ const deleteButtonStyles: Partial<IButtonStyles> = {
     backgroundColor: "red",
     fontSize: "1.1rem",
     border: "none",
-    margin: "0 30px 0 auto",
+    margin: "0 20px 0 auto",
   },
 };
 
@@ -100,8 +101,8 @@ const Tablee: FC = () => {
       .then((data) => {
         setOriginalUsers(data);
         setUsers(data);
-      })
-  }
+      });
+  };
 
   useEffect(() => {
     fetchAllUsers();
@@ -151,9 +152,10 @@ const Tablee: FC = () => {
         <TableCellLayout>
           <input
             type="checkbox"
-            onChange={(event) => handleCheckboxChange(user.id, event)}
+            onChange={(event) => {
+              handleCheckboxChange(user.id, event);
+            }}
           />
-          <EditUser editProps={user} fetchAllUsers={fetchAllUsers} />
         </TableCellLayout>
       </TableCell>
     </TableRow>
@@ -171,19 +173,17 @@ const Tablee: FC = () => {
   ) => {
     const isChecked = event.target.checked;
     const isHere = checkedRows.includes(id);
-    if (isChecked || !isHere) {
+    if (isChecked || isHere === false) {
       setCheckedRows([...checkedRows, id]);
-    } else if (isChecked && isHere) {
-      setCheckedRows(checkedRows.filter((id) => id !== id));
+    } else if (isChecked === false && isHere) {
+      setCheckedRows(checkedRows.filter((elem) => elem !== id));
     }
   };
   //delete
 
   const deleteUsers = (arrId: Array<string>) => {
     if (arrId.length !== 0) {
-
       if (window.confirm("Da li ste sigurni")) {
-
         arrId.map((id) => {
           fetch(`http://localhost:3000/persons/${id}`, {
             method: "DELETE",
@@ -191,11 +191,9 @@ const Tablee: FC = () => {
         });
       }
     } else {
-      alert("Niste selektovali korisnika")
-
+      alert("Niste selektovali korisnika");
     }
   }
-
 
   return (
     <>
@@ -236,6 +234,7 @@ const Tablee: FC = () => {
             deleteUsers(checkedRows);
           }}
         />
+        <EditUser editPropsId={checkedRows} fetchAllUsers={fetchAllUsers} />
       </Stack>
       <Stack>
         <Table arial-label="Default table">

@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState,useRef } from "react";
+import { FC, useEffect, useMemo, useState, useRef } from "react";
 import {
   ActionButton,
   IIconProps,
@@ -7,15 +7,17 @@ import {
   getTheme,
 } from "@fluentui/react";
 
-type User = {
-  id: string;
-  name: string;
-  surname: string;
-  userType: string;
-  createdDate: string;
-  city: string;
-  address: string;
-};
+type User =
+  | {
+    id: string;
+    name: string;
+    surname: string;
+    userType: string;
+    createdDate: string;
+    city: string;
+    address: string;
+  }
+  | undefined;
 
 const iconButtonStyles = {
   root: {
@@ -26,75 +28,75 @@ const iconButtonStyles = {
 const addFriendIcon: IIconProps = { iconName: "Edit" };
 
 interface EditUserProps {
-  editProps: User;
+  editPropsId: string[];
   fetchAllUsers: () => void;
 }
 
 //komponenta
-const EditUser: FC<EditUserProps> = ({ editProps, fetchAllUsers }) => {
-  type IButtonProps = {
-    disabled?: boolean;
-    checked?: boolean;
-  };
-  const props: IButtonProps = { disabled: false, checked: false };
-
-  const modal = document.querySelector(".modal") as HTMLDivElement
-
-  const [user, setUser] = useState({
-    id: editProps.id,
-    name: editProps.name,
-    surname: editProps.surname,
-    userType: editProps.userType,
-    createdDate: editProps.createdDate,
-    city: editProps.city,
-    address: editProps.address,
-  });
+const EditUser: FC<EditUserProps> = ({ editPropsId, fetchAllUsers }) => {
+ 
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [user, setUser] = useState<User>(undefined);
   const [originalUserCopy, setOriginalUserCopy] = useState<User>()
-  useMemo(() => { setOriginalUserCopy(user) }, [])
 
+  useMemo(() => {
+    setOriginalUserCopy(user);
+  }, []);
 
+  useEffect(()=>{
+setIsDisabled(editPropsId.length !==1)
+  },[editPropsId])
+
+  const fetchUserById = () => {
+    if (editPropsId.length === 1) {
+      fetch(`http://localhost:3000/persons/${editPropsId}`)
+        .then((response) => response.json())
+        .then((data) => setUser(data))
+        .catch((error) => console.error("Error fetching data:", error));
+    }
+  };
+  useEffect(() => {
+    fetchUserById();
+  }, [editPropsId]);
   //modal
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const openModal = () => {
-    setIsOpen(true)
-    setTimeout(() => {
-      hendleButtonDisabled()
-    }, 500)
+      setIsOpen(true);
+      setTimeout(() => {
+        hendleButtonDisabled();
+      }, 500); 
   };
   const closeModal = () => setIsOpen(false);
-
 
   //disable button
   useEffect(() => {
     hendleButtonDisabled();
   }, [user]);
   const hendleButtonDisabled = () => {
-    const button = document.querySelector(".submitUser") as HTMLButtonElement
-    if (button) {
-      const hendleChange = user.name !== originalUserCopy?.name ||
+    const button = document.querySelector(".submitUser") as HTMLButtonElement;
+    if (button && user && originalUserCopy) {
+      const hendleChange =
+        user.name !== originalUserCopy?.name ||
         user.surname !== originalUserCopy.surname ||
         user.userType !== originalUserCopy.userType ||
         user.createdDate !== originalUserCopy.createdDate ||
         user.city !== originalUserCopy.city ||
-        user.address !== originalUserCopy.address
-      button.disabled = !hendleChange
+        user.address !== originalUserCopy.address;
+      button.disabled = !hendleChange;
     }
-
-  }
+  };
 
   const editUser = () => {
-
     if (
-      user.name !== "" &&
-      user.surname !== "" &&
-      user.userType !== "" &&
-      user.createdDate !== "" &&
-      user.city !== "" &&
-      user.address !== ""
+      user?.name !== "" &&
+      user?.surname !== "" &&
+      user?.userType !== "" &&
+      user?.createdDate !== "" &&
+      user?.city !== "" &&
+      user?.address !== ""
     ) {
-
       //fetchById
-      fetch(`http://localhost:3000/persons/${user.id}`, {
+      fetch(`http://localhost:3000/persons/${user?.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -105,17 +107,16 @@ const EditUser: FC<EditUserProps> = ({ editProps, fetchAllUsers }) => {
         .then((data) => console.log(data))
         .catch((error) => console.error("Error updating data:", error))
         .finally(() => {
-          closeModal()
-          fetchAllUsers()
+          closeModal();
+          fetchAllUsers();
         });
     }
-  }
- 
+  };
+  
   // //custom modal
 
   //  // **Custom modal state controlled by useRef**
   //  const isCustomModalOpenRef = useRef<boolean>(false);
-  
 
   // // **Open custom modal controlled by useRef**
   // const openCustomModal = () => {
@@ -135,11 +136,10 @@ const EditUser: FC<EditUserProps> = ({ editProps, fetchAllUsers }) => {
   return (
     <>
       <ActionButton
-        onClick={openModal}
+        onClick={() => openModal()}
         iconProps={addFriendIcon}
         allowDisabledFocus
-        disabled={props.disabled}
-        checked={props.checked}
+        disabled={isDisabled}
       >
         Edit user
       </ActionButton>
@@ -160,9 +160,9 @@ const EditUser: FC<EditUserProps> = ({ editProps, fetchAllUsers }) => {
               placeholder="Unesite ime"
               className="input input-ime"
               required={true}
-              value={user.name}
+              value={user?.name}
               onChange={(e) => {
-                setUser({ ...user, name: e.target.value })
+                user && setUser({ ...user, name: e.target.value });
               }}
             />
             <input
@@ -170,40 +170,35 @@ const EditUser: FC<EditUserProps> = ({ editProps, fetchAllUsers }) => {
               placeholder="Unesite prezime"
               className="input input-prezime"
               required={true}
-              value={user.surname}
+              value={user?.surname}
               onChange={(e) => {
-                setUser({ ...user, surname: e.target.value })
+                user && setUser({ ...user, surname: e.target.value });
               }}
             />
-            <input
-              type="text"
-              placeholder="Unesite tip korisnika"
-              className="input input-adrtesa"
-              required={true}
-              value={user.userType}
-              onChange={(e) => {
-                setUser({ ...user, userType: e.target.value })
-              }}
-            />
+            <span>
+              <select value={user?.userType} required={true} name="userType" id="userType" onChange={(e) => user && setUser({ ...user, userType: e.target.value })}>
+                <option value="regular">regular</option>
+                <option value="admin">admin</option>
+              </select>
+            </span>
             <input
               type="date"
               placeholder="Unesite datum kreiranja"
               className="input input-email"
               required={true}
-              value={user.createdDate}
+              value={user?.createdDate}
               onChange={(e) => {
-                setUser({ ...user, createdDate: e.target.value })
-              }
-              }
+                user && setUser({ ...user, createdDate: e.target.value });
+              }}
             />
             <input
               type="text"
               placeholder="Unesite grad"
               className="input input-phone"
               required={true}
-              value={user.city}
+              value={user?.city}
               onChange={(e) => {
-                setUser({ ...user, city: e.target.value })
+                user && setUser({ ...user, city: e.target.value });
               }}
             />
             <input
@@ -211,18 +206,20 @@ const EditUser: FC<EditUserProps> = ({ editProps, fetchAllUsers }) => {
               placeholder="Unesite adresu"
               className="input input-vrtic"
               required={true}
-              value={user.address}
+              value={user?.address}
               onChange={(e) => {
-                setUser({ ...user, address: e.target.value })
+                user && setUser({ ...user, address: e.target.value });
               }}
             />
 
-            <button type="submit" className="submitUser">Submit</button>
+            <button type="submit" className="submitUser">
+              Submit
+            </button>
           </form>
         </div>
-      </Modal>      
+      </Modal>
     </>
-  )
-}
+  );
+};
 
-export default EditUser
+export default EditUser;
