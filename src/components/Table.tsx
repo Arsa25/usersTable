@@ -197,6 +197,13 @@ const Tablee: FC = () => {
 
   return (
     <>
+      <div className="modalDelete">
+        <h2>Da li ste sigurni?</h2>
+        <span>
+          <button className="btn">Yes</button>
+          <button className="btn">No</button>
+        </span>
+      </div>
       <Stack horizontal horizontalAlign="start">
         <CreateUser fetchAllUsers={fetchAllUsers} />
         <ComboBox

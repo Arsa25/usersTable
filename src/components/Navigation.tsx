@@ -20,7 +20,7 @@ const navLinkGroups: INavLinkGroup[] = [
             },
             {
                 name: 'Settings',
-                url: '/',
+                url: '/settings',
                 key: 'key2',
                 iconProps: {
                     iconName: 'PlayerSettings',
@@ -88,5 +88,6 @@ const Navigation: FC = () => {
 
     )
 }
+
 
 export default Navigation;
