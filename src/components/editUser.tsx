@@ -4,7 +4,7 @@ import {
   IIconProps,
   Modal,
   IconButton,
-  getTheme,
+  IActivityItemStyles
 } from "@fluentui/react";
 
 type User =
@@ -25,6 +25,13 @@ const iconButtonStyles = {
     marginRight: "2px",
   },
 };
+
+const actionButtonStyle= {
+  root: {
+    height:"32px",
+    marginLeft:"10px"
+  }
+}
 const addFriendIcon: IIconProps = { iconName: "Edit" };
 
 interface EditUserProps {
@@ -34,18 +41,25 @@ interface EditUserProps {
 
 //komponenta
 const EditUser: FC<EditUserProps> = ({ editPropsId, fetchAllUsers }) => {
- 
-  const [isDisabled, setIsDisabled] = useState(true);
+
+  const [isDisabled, setIsDisabled] = useState(false);
   const [user, setUser] = useState<User>(undefined);
   const [originalUserCopy, setOriginalUserCopy] = useState<User>()
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useMemo(() => {
     setOriginalUserCopy(user);
   }, []);
 
-  useEffect(()=>{
-setIsDisabled(editPropsId.length !==1)
-  },[editPropsId])
+  useEffect(() => {
+    setIsDisabled(editPropsId.length === 1)
+  }, [editPropsId])
+  useEffect(() => {
+    fetchUserById();
+  }, [editPropsId]);
+  useEffect(() => {
+    hendleButtonDisabled();
+  }, [user]);
 
   const fetchUserById = () => {
     if (editPropsId.length === 1) {
@@ -55,23 +69,16 @@ setIsDisabled(editPropsId.length !==1)
         .catch((error) => console.error("Error fetching data:", error));
     }
   };
-  useEffect(() => {
-    fetchUserById();
-  }, [editPropsId]);
   //modal
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const openModal = () => {
-      setIsOpen(true);
-      setTimeout(() => {
-        hendleButtonDisabled();
-      }, 500); 
+    setIsOpen(true);
+    setTimeout(() => {
+      hendleButtonDisabled();
+    }, 500);
   };
   const closeModal = () => setIsOpen(false);
 
   //disable button
-  useEffect(() => {
-    hendleButtonDisabled();
-  }, [user]);
   const hendleButtonDisabled = () => {
     const button = document.querySelector(".submitUser") as HTMLButtonElement;
     if (button && user && originalUserCopy) {
@@ -112,37 +119,19 @@ setIsDisabled(editPropsId.length !==1)
         });
     }
   };
-  
-  // //custom modal
 
-  //  // **Custom modal state controlled by useRef**
-  //  const isCustomModalOpenRef = useRef<boolean>(false);
-
-  // // **Open custom modal controlled by useRef**
-  // const openCustomModal = () => {
-  //   isCustomModalOpenRef.current = true;
-  // };
-
-  // // **Close custom modal controlled by useRef**
-  // const closeCustomModal = () => {
-  //   isCustomModalOpenRef.current = false;
-  // };
-  // const customModalComponent =
-  //   isCustomModalOpenRef.current && createPortal(
-  //     <CustomModal closeModal={closeCustomModal} />,
-  //     document.body
-  //   );
 
   return (
     <>
-      <ActionButton
-        onClick={() => openModal()}
-        iconProps={addFriendIcon}
-        allowDisabledFocus
-        disabled={isDisabled}
-      >
-        Edit user
-      </ActionButton>
+      {isDisabled &&
+        <ActionButton
+          styles={actionButtonStyle}
+          onClick={() => openModal()}
+          iconProps={addFriendIcon}
+          allowDisabledFocus
+        >
+          Edit user
+        </ActionButton>}
       <Modal isOpen={isOpen} onDismiss={closeModal} isBlocking={false}>
         <span style={{ display: "flex", justifyContent: "space-between" }}>
           <h2>Edit user</h2>

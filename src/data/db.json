@@ -1,33 +1,6 @@
 {
   "persons": [
     {
-      "id": "86767a5f-4g5b-4543-bea2-a604392c0075",
-      "name": "Marija",
-      "surname": "Jovanović",
-      "userType": "regular",
-      "createdDate": "2024-02-22",
-      "city": "Kragujevac",
-      "address": "Kralja Petra I 17"
-    },
-    {
-      "id": "86767a5f-3a5b-5555-bea2-a604392c0075",
-      "name": "Nikola",
-      "surname": "Ivanović",
-      "userType": "regular",
-      "createdDate": "2024-02-22",
-      "city": "Subotica",
-      "address": "Trg republike 7"
-    },
-    {
-      "id": "3da9736b-9fc1-555b-a557-12f043ff6d1f",
-      "name": "Arsebuhe",
-      "surname": "Ranković",
-      "userType": "regular",
-      "createdDate": "2024-03-12",
-      "city": "Beograd",
-      "address": "gospodara"
-    },
-    {
       "id": "3da9736b-3fc1-411b-a627-12f043ff6d1f",
       "name": "Marko",
       "surname": "Markovic",
@@ -44,6 +17,15 @@
       "createdDate": "2023-02-23",
       "city": "Beograd",
       "address": "Krunska"
+    },
+    {
+      "id": "91269b3b-489d-4247-ba1b-2d60867a5c32",
+      "name": "Mirko",
+      "surname": "Nikolic",
+      "userType": "regular",
+      "createdDate": "2023-02-26",
+      "city": "Beograd",
+      "address": "Kneza Milosa"
     }
   ]
 }

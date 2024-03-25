@@ -10,16 +10,6 @@ import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 const theme = getTheme();
-type User = {
-  id: string;
-  name: string;
-  surname: string;
-  userType: string;
-  createdDate: string;
-  city: string;
-  address: string;
-};
-type UsersArray = User[];
 
 const iconButtonStyles = {
   root: {
@@ -40,7 +30,7 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
     checked?: boolean;
   };
 
-  const props: IButtonProps = { disabled: false, checked: false };
+  const actionButtonProps: IButtonProps = { disabled: false, checked: false };
   const [user, setUser] = useState({
     id: "",
     name: "",
@@ -108,8 +98,8 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
         onClick={openModal}
         iconProps={addFriendIcon}
         allowDisabledFocus
-        disabled={props.disabled}
-        checked={props.checked}
+        disabled={actionButtonProps.disabled}
+        checked={actionButtonProps.checked}
       >
         Create user
       </ActionButton>

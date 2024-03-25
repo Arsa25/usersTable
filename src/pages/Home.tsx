@@ -1,14 +1,11 @@
 import { useState, useEffect, FC, useRef, useCallback } from "react"
 import Navigation from "../components/Navigation"
-import Tablee from "../components/Table"
+import Tablee from "../components/TableComponent"
 
 
 const Home: FC = () => {
 
     return (
-        <>
-            <header></header>
-
             <div className='ms-Grid' dir='ltr'>
                 <div className='ms-Grid-row'>
                     <div className='ms-Grid-col ms-sm2 ms-lg2'>
@@ -19,7 +16,6 @@ const Home: FC = () => {
                     </div>
                 </div>
             </div>
-        </>
     )
 }
 
