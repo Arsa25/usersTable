@@ -113,6 +113,7 @@ const TableComponent: FC = () => {
     let filtered = originalUsers;
     if (searchValue.trim() !== "") {
       filtered = filtered.filter((user) =>
+        user.userType === selectedOption &&
         user.name.toLowerCase().includes(searchValue.toLowerCase())
       )
       setUsers(filtered)
