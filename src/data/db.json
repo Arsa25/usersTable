@@ -26,6 +26,15 @@
       "createdDate": "2023-02-26",
       "city": "Beograd",
       "address": "Kneza Milosa"
+    },
+    {
+      "id": "94c15b30-6d5c-4990-84e5-40207839c977",
+      "name": "Milica",
+      "surname": "Milicevic",
+      "userType": "regular",
+      "createdDate": "2023-02-02",
+      "city": "Beograd",
+      "address": "Carli Caplina 18"
     }
   ]
 }

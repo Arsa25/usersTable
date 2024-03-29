@@ -4,12 +4,9 @@ import {
   IIconProps,
   Modal,
   IconButton,
-  getTheme,
 } from "@fluentui/react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-
-const theme = getTheme();
 
 const iconButtonStyles = {
   root: {
@@ -18,29 +15,28 @@ const iconButtonStyles = {
   },
 };
 const addFriendIcon: IIconProps = { iconName: "AddFriend" };
-//createUser
 
-interface CreateUserProps {
-  fetchAllUsers: () => void;
-}
 //komponenta
-const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
-  type IButtonProps = {
-    disabled?: boolean;
-    checked?: boolean;
-  };
+const CreateUser: FC = () => {
 
-  const actionButtonProps: IButtonProps = { disabled: false, checked: false };
   const [user, setUser] = useState({
     id: "",
     name: "",
     surname: "",
-    userType: "",
+    userType: "regular",
     createdDate: "",
     city: "",
     address: "",
   });
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
+  // type IButtonProps = {
+  //   disabled?: boolean;
+  //   checked?: boolean;
+  // };
+  // const actionButtonProps: IButtonProps = { disabled: false, checked: false };
   const requestOptions = {
     method: "POST",
     headers: {
@@ -49,19 +45,10 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
     body: JSON.stringify(user),
   };
 
-  //modal
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
-
   const createUser = (e: any) => {
     e.preventDefault();
-
     const userId = uuidv4();
     setUser({ ...user, id: userId });
-    console.log(userId);
-
     if (
       user.id !== "" &&
       user.name !== "" &&
@@ -71,6 +58,7 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
       user.city !== "" &&
       user.address !== ""
     ) {
+      console.log(user);
       //fetch
       fetch("http://localhost:3000/persons", requestOptions)
         .then((response) => {
@@ -89,7 +77,6 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
           );
         });
       closeModal();
-      fetchAllUsers();
     }
   };
   return (
@@ -98,8 +85,6 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
         onClick={openModal}
         iconProps={addFriendIcon}
         allowDisabledFocus
-        disabled={actionButtonProps.disabled}
-        checked={actionButtonProps.checked}
       >
         Create user
       </ActionButton>
@@ -130,18 +115,11 @@ const CreateUser: FC<CreateUserProps> = ({ fetchAllUsers }) => {
               onChange={(e) => setUser({ ...user, surname: e.target.value })}
             />
             <span>
-              <select required={true} name="userType" id="userType" onChange={(e) => setUser({ ...user, userType: e.target.value})}>
+              <select value={user?.userType || "regular"} required={true} name="userType" id="userType" onChange={(e) => setUser({ ...user, userType: e.target.value || "regular" })}>
                 <option value="regular">regular</option>
                 <option value="admin">admin</option>
               </select>
             </span>
-            {/* <input
-              type="text"
-              placeholder="Unesite tip korisnika"
-              className="input input-adrtesa"
-              required={true}
-              onChange={(e) => setUser({ ...user, userType: e.target.value })}
-            /> */}
             <input
               type="date"
               placeholder="Unesite datum kreiranja"

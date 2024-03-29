@@ -1,22 +1,18 @@
-import { FC, useEffect, useMemo, useState, useRef } from "react";
+import { FC, useEffect, useState, useRef } from "react";
 import {
-  ActionButton,
-  IIconProps,
   Modal,
-  IconButton,
-  IActivityItemStyles
-} from "@fluentui/react";
+  IconButton, ActionButton, IIconProps
+} from "@fluentui/react"
 
-type User =
-  | {
-    id: string;
-    name: string;
-    surname: string;
-    userType: string;
-    createdDate: string;
-    city: string;
-    address: string;
-  }
+type User = {
+  id: string;
+  name: string;
+  surname: string;
+  userType: string;
+  createdDate: string;
+  city: string;
+  address: string;
+}
   | undefined;
 
 const iconButtonStyles = {
@@ -26,73 +22,44 @@ const iconButtonStyles = {
   },
 };
 
-const actionButtonStyle= {
-  root: {
-    height:"32px",
-    marginLeft:"10px"
-  }
-}
-const addFriendIcon: IIconProps = { iconName: "Edit" };
-
 interface EditUserProps {
-  editPropsId: string[];
-  fetchAllUsers: () => void;
+  editPropsId: string | undefined
+  hendleEditModal: React.Dispatch<React.SetStateAction<boolean>>
+  
 }
 
 //komponenta
-const EditUser: FC<EditUserProps> = ({ editPropsId, fetchAllUsers }) => {
+const EditUser: FC<EditUserProps> = ({ editPropsId,hendleEditModal }) => {
+  const submitUser = useRef<HTMLButtonElement>(null)
 
-  const [isDisabled, setIsDisabled] = useState(false);
   const [user, setUser] = useState<User>(undefined);
   const [originalUserCopy, setOriginalUserCopy] = useState<User>()
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(true);
 
-  useMemo(() => {
-    setOriginalUserCopy(user);
-  }, []);
+  const isModalOpen = (bool: boolean) => {
+    setIsOpen(!bool)
+    hendleEditModal(!bool)
+  }
 
-  useEffect(() => {
-    setIsDisabled(editPropsId.length === 1)
-  }, [editPropsId])
   useEffect(() => {
     fetchUserById();
   }, [editPropsId]);
   useEffect(() => {
     hendleButtonDisabled();
-  }, [user]);
+    console.log(submitUser.current);
+  }, [user, isOpen]);
 
+
+  //GET byId
   const fetchUserById = () => {
-    if (editPropsId.length === 1) {
-      fetch(`http://localhost:3000/persons/${editPropsId}`)
-        .then((response) => response.json())
-        .then((data) => setUser(data))
-        .catch((error) => console.error("Error fetching data:", error));
-    }
+    editPropsId && fetch(`http://localhost:3000/persons/${editPropsId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setUser(data)
+        setOriginalUserCopy(data)
+      })
+      .catch((error) => console.error("Error fetching data:", error))
   };
-  //modal
-  const openModal = () => {
-    setIsOpen(true);
-    setTimeout(() => {
-      hendleButtonDisabled();
-    }, 500);
-  };
-  const closeModal = () => setIsOpen(false);
-
-  //disable button
-  const hendleButtonDisabled = () => {
-    const button = document.querySelector(".submitUser") as HTMLButtonElement;
-    if (button && user && originalUserCopy) {
-      const hendleChange =
-        user.name !== originalUserCopy?.name ||
-        user.surname !== originalUserCopy.surname ||
-        user.userType !== originalUserCopy.userType ||
-        user.createdDate !== originalUserCopy.createdDate ||
-        user.city !== originalUserCopy.city ||
-        user.address !== originalUserCopy.address;
-      button.disabled = !hendleChange;
-    }
-  };
-
   const editUser = () => {
     if (
       user?.name !== "" &&
@@ -102,7 +69,7 @@ const EditUser: FC<EditUserProps> = ({ editPropsId, fetchAllUsers }) => {
       user?.city !== "" &&
       user?.address !== ""
     ) {
-      //fetchById
+      //PUT
       fetch(`http://localhost:3000/persons/${user?.id}`, {
         method: "PUT",
         headers: {
@@ -113,32 +80,38 @@ const EditUser: FC<EditUserProps> = ({ editPropsId, fetchAllUsers }) => {
         .then((response) => response.json())
         .then((data) => console.log(data))
         .catch((error) => console.error("Error updating data:", error))
-        .finally(() => {
-          closeModal();
-          fetchAllUsers();
-        });
+      .finally(() => {
+        window.location.reload()
+      });
     }
   };
+  //disable button
 
+  const hendleButtonDisabled = () => {
+    if (submitUser.current && user && originalUserCopy) {
 
+      const hendleChange =
+        user.name !== originalUserCopy?.name ||
+        user.surname !== originalUserCopy.surname ||
+        user.userType !== originalUserCopy.userType ||
+        user.createdDate !== originalUserCopy.createdDate ||
+        user.city !== originalUserCopy.city ||
+        user.address !== originalUserCopy.address
+      console.log(hendleChange);
+      console.log(submitUser.current);
+
+      submitUser.current!.disabled = !hendleChange
+    }
+  }
   return (
     <>
-      {isDisabled &&
-        <ActionButton
-          styles={actionButtonStyle}
-          onClick={() => openModal()}
-          iconProps={addFriendIcon}
-          allowDisabledFocus
-        >
-          Edit user
-        </ActionButton>}
-      <Modal isOpen={isOpen} onDismiss={closeModal} isBlocking={false}>
+      <Modal isOpen={isOpen} isBlocking={false}>
         <span style={{ display: "flex", justifyContent: "space-between" }}>
           <h2>Edit user</h2>
           <IconButton
             iconProps={{ iconName: "Cancel" }}
             ariaLabel="Close modal"
-            onClick={closeModal}
+            onClick={() => isModalOpen(true)}
             styles={iconButtonStyles}
           />
         </span>
@@ -200,8 +173,7 @@ const EditUser: FC<EditUserProps> = ({ editPropsId, fetchAllUsers }) => {
                 user && setUser({ ...user, address: e.target.value });
               }}
             />
-
-            <button type="submit" className="submitUser">
+            <button type="submit" className="submitUser" disabled ref={submitUser}>
               Submit
             </button>
           </form>

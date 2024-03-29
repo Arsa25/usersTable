@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@fluentui/react": "^8.115.6",
+    "@fluentui/react-alert": "^9.0.0-beta.114",
     "@fluentui/react-components": "^9.46.5",
     "@fluentui/react-icons": "^2.0.230",
     "@testing-library/jest-dom": "^5.17.0",
