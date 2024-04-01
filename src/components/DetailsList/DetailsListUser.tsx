@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import { FC, useState, useEffect } from "react"
 import {
     DetailsList,
     IColumn,
@@ -10,10 +10,54 @@ import {
     IButtonStyles,
     IIconProps,
     IDetailsListStyles,
-    ActionButton,
+    IStackTokens,
+    IStackStyles,
+    ComboBox,
+    SearchBox,
+    DefaultButton,
+    IComboBox,
+    IComboBoxOption,
+    SelectableOptionMenuItemType,
+    IComboBoxStyles,
+    ISearchBoxStyles
 } from "@fluentui/react";
 import EditUser from "../EditUser";
+import CreateUser from "../CreateUser";
+import DeleteModalAlert from "../DeleteModalAlert";
 
+type User = {
+    id: string;
+    name: string;
+    surname: string;
+    userType: string;
+    createdDate: string;
+    city: string;
+    address: string;
+};
+//comboBox
+const options: IComboBoxOption[] = [
+    {
+        key: "Header1",
+        text: "User types",
+        itemType: SelectableOptionMenuItemType.Header,
+    },
+    { key: "All", text: "All" },
+    { key: "A", text: "regular" },
+    { key: "B", text: "admin" },
+];
+//styles
+//searchBox
+const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 200, margin: "0 2px 0 10px " } };
+const comboBoxStyles: Partial<IComboBoxStyles> = { root: { width: 80 } };
+const stackStyles: IStackStyles = {
+    root: {
+        width: "100%",
+        display: "flex",
+        justifyContent: "flex-end",
+        padding: "0px 50px 0px 0",
+    },
+};
+const containerStackTokens: IStackTokens = { childrenGap: 5 };
 const detailsListStyles: Partial<IDetailsListStyles> = {
     root: {
         position: "absolute",
@@ -34,8 +78,8 @@ const classNames = mergeStyleSets({
         fontWeight: 'bold'
     },
 });
-
-const addFriendIcon: IIconProps = { iconName: "Edit" };
+const editFriendIcon: IIconProps = { iconName: "Edit" }
+const addFriendIcon: IIconProps = { iconName: "AddFriend" }
 
 const actionButtonStyle = {
     root: {
@@ -43,8 +87,6 @@ const actionButtonStyle = {
         marginLeft: "10px"
     }
 }
-
-//delete
 const deleteButtonStyles: Partial<IButtonStyles> = {
     root: {
         fontSize: "1.1rem",
@@ -52,40 +94,34 @@ const deleteButtonStyles: Partial<IButtonStyles> = {
     },
 }
 const deleteIcon: IIconProps = { iconName: "delete" };
-type User = {
-    id: string;
-    name: string;
-    surname: string;
-    userType: string;
-    createdDate: string;
-    city: string;
-    address: string;
-};
+
 interface UserRenderProps {
-    users: User[]
+    originalUsers: User[]
+    serOriginalUsers: React.Dispatch<React.SetStateAction<User[]>>
+
 }
-const DetailsListUser: FC<UserRenderProps> = ({ users }) => {
-    const [checkedRowsId, setCheckedRowsId] = useState<string | undefined>(undefined);
+const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers }) => {
+    const [users, setUsers] = useState<User[]>(originalUsers)
+    const [searchValue, setSearchValue] = useState<string>("")
+    const [selectedOption, setSelectedOption] = useState<string>("All")
+    const [checkedRowsId, setCheckedRowsId] = useState<string | undefined>(undefined)
     const [isModalBtnVisible, setIsModalBtnVisible] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+    const hendleCreateModal = (bool: boolean) => {
+        setIsCreateModalOpen(!bool)
+    }
+    useEffect(() => {
+        let filtered = users
+        if (selectedOption !== "All") {
+            filtered = filtered.filter((user) => user.userType === selectedOption);
+            serOriginalUsers(filtered);
+        } else {
+            serOriginalUsers(users)
+        }
+    }, [selectedOption])
 
     const columns: IColumn[] = [
-        {
-            key: 'column7',
-            name: "",
-            className: classNames.fileIconCell,
-            styles: {
-                root: {
-                    span: {
-                        fontSize: '1.2rem',
-                    }
-                },
-            },
-            onRender: (item: User) => renderCheckbox(item),
-            fieldName: '',
-            minWidth: 20,
-            maxWidth: 30
-        },
         {
             key: 'column1',
             name: "Name",
@@ -99,7 +135,7 @@ const DetailsListUser: FC<UserRenderProps> = ({ users }) => {
             },
             fieldName: 'name',
             minWidth: 80,
-            maxWidth: 120,
+            maxWidth: 110,
         },
         {
             key: 'column2',
@@ -175,6 +211,21 @@ const DetailsListUser: FC<UserRenderProps> = ({ users }) => {
             fieldName: 'address',
             minWidth: 50,
             maxWidth: 120
+        }, {
+            key: 'column7',
+            name: "",
+            className: classNames.fileIconCell,
+            styles: {
+                root: {
+                    span: {
+                        fontSize: '1.2rem',
+                    }
+                },
+            },
+            onRender: (item: User) => renderCheckbox(item),
+            fieldName: '',
+            minWidth: 20,
+            maxWidth: 30
         }
     ]
     //checkbox
@@ -194,65 +245,86 @@ const DetailsListUser: FC<UserRenderProps> = ({ users }) => {
     const hendleEditModal = (bool: boolean) => {
         setIsEditModalOpen(!bool)
     }
-    //delete
-    const deleteUsers = (arrId: string) => {
-        fetch(`http://localhost:3000/persons/${arrId}`, {
-            method: "DELETE",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-        window.location.reload()
+
+    const searchF = () => {
+        let filtered = originalUsers;
+        if (searchValue.trim() !== "") {
+            filtered = filtered.filter((user) =>
+                user.userType === selectedOption || selectedOption === "All" &&
+                user.name.toLowerCase().includes(searchValue.toLowerCase())
+            )
+            serOriginalUsers(filtered)
+        } else {
+            serOriginalUsers(users)
+        }
     }
 
-
-return (
-    <Stack>
-        <div>
-            {isModalBtnVisible &&
-                <div className="modalDelete">
-                    <h2>Da li ste sigurni?</h2>
-                    <span>
-                        <button onClick={() => {
-                            checkedRowsId && deleteUsers(checkedRowsId)
-                            setIsModalBtnVisible(false)
-                        }} className="btn">Yes</button>
-                        <button onClick={() => setIsModalBtnVisible(false)} className="btn">No</button>
-                    </span>
-                </div>}
-            {checkedRowsId !== undefined && checkedRowsId.length > 0 &&
-                <PrimaryButton
-                    text="Delete"
-                    allowDisabledFocus
-                    iconProps={deleteIcon}
-                    styles={deleteButtonStyles}
-                    onClick={() => {
-                        setIsModalBtnVisible(true)
-                    }}
-                />}
-            {
-                checkedRowsId !== undefined && checkedRowsId.length > 0 &&
-                <ActionButton
-                    text="Edit"
-                    styles={actionButtonStyle}
-                    onClick={() => hendleEditModal(false)}
-                    iconProps={addFriendIcon}
-                    allowDisabledFocus />
-            }
-            {
-                isEditModalOpen && <EditUser editPropsId={checkedRowsId} hendleEditModal={setIsEditModalOpen} />
-            }
-        </div>
-        <div>
-            <DetailsList
-                items={users}
-                columns={columns}
-                selectionMode={SelectionMode.none}
-                styles={detailsListStyles}
-            />
-        </div>
-    </Stack>
-)
+    return (
+        <Stack>
+            <Stack horizontal>
+                <Stack horizontal >
+                    <ComboBox
+                        defaultSelectedKey="All"
+                        options={options}
+                        onItemClick={(
+                            event: React.FormEvent<IComboBox>,
+                            option?: IComboBoxOption,
+                            index?: number
+                        ) => {
+                            setSelectedOption(option?.text || "All");
+                        }}
+                        styles={comboBoxStyles}
+                    />
+                    <SearchBox
+                        styles={searchBoxStyles}
+                        placeholder="Search"
+                        value={searchValue}
+                        onChange={(event, newValue) => setSearchValue(newValue || "")}
+                    />
+                    < DefaultButton
+                        text="search"
+                        onClick={() => searchF()}
+                    />
+                </Stack>
+                <Stack horizontal tokens={containerStackTokens} styles={stackStyles}>
+                    {checkedRowsId !== undefined && checkedRowsId.length > 0 &&
+                        <PrimaryButton
+                            text="Delete"
+                            allowDisabledFocus
+                            iconProps={deleteIcon}
+                            styles={deleteButtonStyles}
+                            onClick={() => {
+                                setIsModalBtnVisible(true)
+                            }}
+                        />}
+                    {checkedRowsId !== undefined && checkedRowsId.length > 0 &&
+                        <PrimaryButton
+                            text="EDIT"
+                            styles={actionButtonStyle}
+                            onClick={() => hendleEditModal(false)}
+                            iconProps={editFriendIcon}
+                            allowDisabledFocus />
+                    }
+                    <PrimaryButton
+                        text="CREATE USER"
+                        onClick={() => hendleCreateModal(false)}
+                        iconProps={addFriendIcon}
+                        allowDisabledFocus />
+                </Stack>
+            </Stack>
+            {isCreateModalOpen && <CreateUser hendleCreateModal={setIsCreateModalOpen} />}
+            {isEditModalOpen && <EditUser editPropsId={checkedRowsId} hendleEditModal={setIsEditModalOpen} />}
+            {isModalBtnVisible && <DeleteModalAlert setIsModalBtnVisible={setIsModalBtnVisible} checkedRowsId={checkedRowsId} />}
+            <Stack>
+                <DetailsList
+                    items={originalUsers}
+                    columns={columns}
+                    selectionMode={SelectionMode.none}
+                    styles={detailsListStyles}
+                />
+            </Stack>
+        </Stack>
+    )
 }
 
 export default DetailsListUser;
