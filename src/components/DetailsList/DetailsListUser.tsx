@@ -64,9 +64,6 @@ type User = {
 interface UserRenderProps {
     users: User[]
 }
-
-
-
 const DetailsListUser: FC<UserRenderProps> = ({ users }) => {
     const [checkedRowsId, setCheckedRowsId] = useState<string | undefined>(undefined);
     const [isModalBtnVisible, setIsModalBtnVisible] = useState(false)
@@ -204,16 +201,7 @@ const DetailsListUser: FC<UserRenderProps> = ({ users }) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-        }).then(response => {
-            if (response.ok) {
-                alert('Korisni je uspešno obrisan.');
-            } else {
-                alert('Došlo je do greške prilikom brisanja korisnika.');
-            }
-        }).catch(error => {
-            console.error('Došlo je do greške prilikom slanja zahteva:', error);
-            alert('Došlo je do greške prilikom slanja zahteva za brisanje korisnika.');
-        });
+        })
         window.location.reload()
     }
 

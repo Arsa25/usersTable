@@ -46,7 +46,6 @@ const EditUser: FC<EditUserProps> = ({ editPropsId,hendleEditModal }) => {
   }, [editPropsId]);
   useEffect(() => {
     hendleButtonDisabled();
-    console.log(submitUser.current);
   }, [user, isOpen]);
 
 
@@ -97,8 +96,6 @@ const EditUser: FC<EditUserProps> = ({ editPropsId,hendleEditModal }) => {
         user.createdDate !== originalUserCopy.createdDate ||
         user.city !== originalUserCopy.city ||
         user.address !== originalUserCopy.address
-      console.log(hendleChange);
-      console.log(submitUser.current);
 
       submitUser.current!.disabled = !hendleChange
     }

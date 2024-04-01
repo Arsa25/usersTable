@@ -1,11 +1,8 @@
-import { FC } from "react";
+import { FC, useState, useRef, useEffect } from "react";
 import {
-  ActionButton,
-  IIconProps,
   Modal,
   IconButton,
 } from "@fluentui/react";
-import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 const iconButtonStyles = {
@@ -14,11 +11,12 @@ const iconButtonStyles = {
     marginRight: "2px",
   },
 };
-const addFriendIcon: IIconProps = { iconName: "AddFriend" };
+interface IProps {
+  hendleCreateModal: React.Dispatch<React.SetStateAction<boolean>>
+}
 
-//komponenta
-const CreateUser: FC = () => {
-
+const CreateUser: FC<IProps> = ({hendleCreateModal}) => {
+  const submitUser = useRef<HTMLButtonElement>(null)
   const [user, setUser] = useState({
     id: "",
     name: "",
@@ -28,15 +26,16 @@ const CreateUser: FC = () => {
     city: "",
     address: "",
   });
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(true);
 
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
-  // type IButtonProps = {
-  //   disabled?: boolean;
-  //   checked?: boolean;
-  // };
-  // const actionButtonProps: IButtonProps = { disabled: false, checked: false };
+  const isModalOpen = (bool: boolean) => {
+    setIsOpen(!bool)
+    hendleCreateModal(!bool)    
+  }
+
+  useEffect(() => {
+    hendleButtonDisabled()
+  }, [user])
   const requestOptions = {
     method: "POST",
     headers: {
@@ -58,8 +57,6 @@ const CreateUser: FC = () => {
       user.city !== "" &&
       user.address !== ""
     ) {
-      console.log(user);
-      //fetch
       fetch("http://localhost:3000/persons", requestOptions)
         .then((response) => {
           if (!response.ok) {
@@ -76,30 +73,38 @@ const CreateUser: FC = () => {
             error
           );
         });
-      closeModal();
+      isModalOpen(true)
+      window.location.reload()
     }
   };
+  const hendleButtonDisabled = () => {
+    if (submitUser.current && user) {
+
+      const hendleChange =
+        user.name !== "" &&
+        user.surname !== "" &&
+        user.userType !== "" &&
+        user.createdDate !== "" &&
+        user.city !== "" &&
+        user.address !== ""
+
+      submitUser.current!.disabled = !hendleChange
+    }
+  }
   return (
     <>
-      <ActionButton
-        onClick={openModal}
-        iconProps={addFriendIcon}
-        allowDisabledFocus
-      >
-        Create user
-      </ActionButton>
-      <Modal isOpen={isOpen} onDismiss={closeModal} isBlocking={false}>
+      <Modal isOpen={isOpen} isBlocking={false}>
         <span style={{ display: "flex", justifyContent: "space-between" }}>
           <h2>Create user</h2>
           <IconButton
             iconProps={{ iconName: "Cancel" }}
             ariaLabel="Close modal"
-            onClick={closeModal}
+            onClick={() => isModalOpen(true)}
             styles={iconButtonStyles}
           />
         </span>
         <div className="containerEmployeeAdd">
-          <form className="addUser" onSubmit={createUser}>
+          <form className="addUser" noValidate onSubmit={createUser}>
             <input
               type="text"
               placeholder="Unesite ime"
@@ -144,7 +149,9 @@ const CreateUser: FC = () => {
               onChange={(e) => setUser({ ...user, address: e.target.value })}
             />
 
-            <input type="submit" placeholder="Submit" className="submitUser" />
+            <button type="submit" className="submitUser" disabled ref={submitUser} >
+              Submit
+            </button>
           </form>
         </div>
       </Modal>

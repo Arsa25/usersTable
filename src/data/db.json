@@ -7,7 +7,7 @@
       "userType": "admin",
       "createdDate": "2023-01-24",
       "city": "Beograd",
-      "address": "Kneza Milosa"
+      "address": "Kneza Milos"
     },
     {
       "id": "3da9736b-9fc1-413b-a627-12f043ff6f5",
@@ -19,22 +19,31 @@
       "address": "Krunska"
     },
     {
-      "id": "91269b3b-489d-4247-ba1b-2d60867a5c32",
-      "name": "Mirko",
-      "surname": "Nikolic",
+      "id": "cad2392b-9c4e-47ca-bb99-364bcbd27c66",
+      "name": "Jovana",
+      "surname": "Jovanovic",
       "userType": "regular",
-      "createdDate": "2023-02-26",
+      "createdDate": "2024-02-02",
       "city": "Beograd",
-      "address": "Kneza Milosa"
+      "address": "Beogradska"
     },
     {
-      "id": "94c15b30-6d5c-4990-84e5-40207839c977",
-      "name": "Milica",
-      "surname": "Milicevic",
+      "id": "6cd9f865-de43-42b5-8acb-f623508296d5",
+      "name": "Kristina",
+      "surname": "Krstic",
+      "userType": "regular",
+      "createdDate": "2024-02-03",
+      "city": "Beograd",
+      "address": "Savska"
+    },
+    {
+      "id": "59cf5460-a70e-401a-8ad9-94a69313b3e5",
+      "name": "Zoja",
+      "surname": "Tomic",
       "userType": "regular",
       "createdDate": "2023-02-02",
       "city": "Beograd",
-      "address": "Carli Caplina 18"
+      "address": "Sarevska"
     }
   ]
 }

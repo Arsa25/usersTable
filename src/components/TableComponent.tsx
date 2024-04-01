@@ -1,8 +1,9 @@
 import * as React from "react";
 import { FC, useState, useEffect, } from "react";
 import {
-  Stack,
   IIconProps,
+  Stack,
+  ActionButton,
   IComboBoxOption,
   SelectableOptionMenuItemType,
   ComboBox,
@@ -25,6 +26,8 @@ type User = {
   address: string;
 };
 type UsersArray = User[];
+
+const addFriendIcon: IIconProps = { iconName: "AddFriend" };
 
 type Column = {
   columnKey: string;
@@ -61,6 +64,11 @@ const TableComponent: FC = () => {
   const [selectedOption, setSelectedOption] = useState<string>("All");
   const [searchValue, setSearchValue] = useState<string>("");
 
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const hendleCreateModal = (bool: boolean) => {
+    setIsCreateModalOpen(!bool)
+  }
+
   useEffect(() => {
     fetchAllUsers();
   }, []);
@@ -88,7 +96,7 @@ const TableComponent: FC = () => {
     let filtered = originalUsers;
     if (searchValue.trim() !== "") {
       filtered = filtered.filter((user) =>
-        user.userType === selectedOption &&
+        user.userType === selectedOption || selectedOption === "All"  &&
         user.name.toLowerCase().includes(searchValue.toLowerCase())
       )
       setUsers(filtered)
@@ -122,7 +130,14 @@ const TableComponent: FC = () => {
           text="search"
           onClick={() => searchF()}
         />
-        <CreateUser />
+        <ActionButton
+          onClick={() => hendleCreateModal(false)}
+          iconProps={addFriendIcon}
+          allowDisabledFocus
+        >
+          Create user
+        </ActionButton>
+        {isCreateModalOpen && <CreateUser hendleCreateModal={setIsCreateModalOpen} />}
       </Stack>
       <DetailsListUser users={users} />
     </>
