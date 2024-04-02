@@ -45,7 +45,7 @@ const TableComponent: FC = () => {
   };
   return (
     <>
-      <DetailsListUser originalUsers={originalUsers} serOriginalUsers={setOriginalUsers} />
+      <DetailsListUser originalUsers={originalUsers} serOriginalUsers={setOriginalUsers} fetchAllUsers={fetchAllUsers} />
     </>
   );
 };

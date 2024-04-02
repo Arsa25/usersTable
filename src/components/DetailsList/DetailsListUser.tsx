@@ -98,13 +98,13 @@ const deleteIcon: IIconProps = { iconName: "delete" };
 interface UserRenderProps {
     originalUsers: User[]
     serOriginalUsers: React.Dispatch<React.SetStateAction<User[]>>
-
+    fetchAllUsers: () => void
 }
-const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers }) => {
+const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers,fetchAllUsers }) => {
     const [users, setUsers] = useState<User[]>(originalUsers)
     const [searchValue, setSearchValue] = useState<string>("")
     const [selectedOption, setSelectedOption] = useState<string>("All")
-    const [checkedRowsId, setCheckedRowsId] = useState<string | undefined>(undefined)
+    const [checkedRowsId, setCheckedRowsId] = useState<string>("")
     const [isModalBtnVisible, setIsModalBtnVisible] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -230,7 +230,7 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers 
     ]
     //checkbox
     const onChange = (itemId: string) => {
-        itemId === checkedRowsId ? setCheckedRowsId(undefined) : setCheckedRowsId(itemId);
+        itemId === checkedRowsId ? setCheckedRowsId("") : setCheckedRowsId(itemId);
     };
     const renderCheckbox = (item: User) => {
         const isDisabled = checkedRowsId !== undefined && checkedRowsId !== item.id;
@@ -314,7 +314,7 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers 
             </Stack>
             {isCreateModalOpen && <CreateUser hendleCreateModal={setIsCreateModalOpen} />}
             {isEditModalOpen && <EditUser editPropsId={checkedRowsId} hendleEditModal={setIsEditModalOpen} />}
-            {isModalBtnVisible && <DeleteModalAlert setIsModalBtnVisible={setIsModalBtnVisible} checkedRowsId={checkedRowsId} />}
+            {isModalBtnVisible && <DeleteModalAlert setIsModalBtnVisible={setIsModalBtnVisible} checkedRowsId={checkedRowsId} fetchAllUsers={fetchAllUsers} />}
             <Stack>
                 <DetailsList
                     items={originalUsers}

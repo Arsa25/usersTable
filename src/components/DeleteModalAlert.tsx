@@ -1,10 +1,11 @@
 import {FC} from 'react'
 interface IDeleteModalAlertProps {
-    checkedRowsId: string | undefined;
-    setIsModalBtnVisible: React.Dispatch<React.SetStateAction<boolean>>;
+    checkedRowsId: string;
+    setIsModalBtnVisible: React.Dispatch<React.SetStateAction<boolean>>
+    fetchAllUsers: () => void;
 }
 
-const DeleteModalAlert: FC<IDeleteModalAlertProps> = ({checkedRowsId,setIsModalBtnVisible}) => {
+const DeleteModalAlert: FC<IDeleteModalAlertProps> = ({checkedRowsId,setIsModalBtnVisible,fetchAllUsers}) => {
 
     //delete
     const deleteUsers = (arrId: string) => {
@@ -14,7 +15,7 @@ const DeleteModalAlert: FC<IDeleteModalAlertProps> = ({checkedRowsId,setIsModalB
                 'Content-Type': 'application/json'
             },
         })
-        window.location.reload()
+        fetchAllUsers()
     }
 
     return (
@@ -22,7 +23,7 @@ const DeleteModalAlert: FC<IDeleteModalAlertProps> = ({checkedRowsId,setIsModalB
             <h2>Da li ste sigurni?</h2>
             <span>
                 <button onClick={() => {
-                    checkedRowsId && deleteUsers(checkedRowsId)
+                    deleteUsers(checkedRowsId)
                     setIsModalBtnVisible(false)
                 }} className="btn">Yes</button>
                 <button onClick={() => setIsModalBtnVisible(false)} className="btn">No</button>
