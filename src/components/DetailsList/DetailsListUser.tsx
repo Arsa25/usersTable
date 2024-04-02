@@ -97,27 +97,27 @@ const deleteIcon: IIconProps = { iconName: "delete" };
 
 interface UserRenderProps {
     originalUsers: User[]
-    serOriginalUsers: React.Dispatch<React.SetStateAction<User[]>>
     fetchAllUsers: () => void
 }
-const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers,fetchAllUsers }) => {
-    const [users, setUsers] = useState<User[]>(originalUsers)
+const DetailsListUser: FC<UserRenderProps> = ({ originalUsers,fetchAllUsers }) => {
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([])
     const [searchValue, setSearchValue] = useState<string>("")
     const [selectedOption, setSelectedOption] = useState<string>("All")
     const [checkedRowsId, setCheckedRowsId] = useState<string>("")
+
     const [isModalBtnVisible, setIsModalBtnVisible] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-    const hendleCreateModal = (bool: boolean) => {
-        setIsCreateModalOpen(!bool)
-    }
+
+   useEffect(() => {
+        setFilteredUsers(originalUsers)
+   },[originalUsers])
+
     useEffect(() => {
-        let filtered = users
         if (selectedOption !== "All") {
-            filtered = filtered.filter((user) => user.userType === selectedOption);
-            serOriginalUsers(filtered);
+            setFilteredUsers(originalUsers.filter((user) => user.userType === selectedOption));
         } else {
-            serOriginalUsers(users)
+            setFilteredUsers(originalUsers)
         }
     }, [selectedOption])
 
@@ -245,17 +245,15 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers,
     const hendleEditModal = (bool: boolean) => {
         setIsEditModalOpen(!bool)
     }
-
-    const searchF = () => {
-        let filtered = originalUsers;
+    const searchUsers = (filteredUsers:User[]) => {
         if (searchValue.trim() !== "") {
-            filtered = filtered.filter((user) =>
+            setFilteredUsers(filteredUsers.filter((user) =>
                 user.userType === selectedOption || selectedOption === "All" &&
                 user.name.toLowerCase().includes(searchValue.toLowerCase())
-            )
-            serOriginalUsers(filtered)
+            ))
+            
         } else {
-            serOriginalUsers(users)
+            setFilteredUsers(originalUsers)
         }
     }
 
@@ -283,9 +281,10 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers,
                     />
                     < DefaultButton
                         text="search"
-                        onClick={() => searchF()}
+                        onClick={() => searchUsers(originalUsers)}
                     />
                 </Stack>
+
                 <Stack horizontal tokens={containerStackTokens} styles={stackStyles}>
                     {checkedRowsId !== undefined && checkedRowsId.length > 0 &&
                         <PrimaryButton
@@ -307,7 +306,7 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers,
                     }
                     <PrimaryButton
                         text="CREATE USER"
-                        onClick={() => hendleCreateModal(false)}
+                        onClick={() => setIsCreateModalOpen(!isCreateModalOpen)}
                         iconProps={addFriendIcon}
                         allowDisabledFocus />
                 </Stack>
@@ -317,7 +316,7 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers, serOriginalUsers,
             {isModalBtnVisible && <DeleteModalAlert setIsModalBtnVisible={setIsModalBtnVisible} checkedRowsId={checkedRowsId} fetchAllUsers={fetchAllUsers} />}
             <Stack>
                 <DetailsList
-                    items={originalUsers}
+                    items={filteredUsers}
                     columns={columns}
                     selectionMode={SelectionMode.none}
                     styles={detailsListStyles}

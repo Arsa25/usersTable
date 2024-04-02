@@ -31,6 +31,7 @@ const columns: Column[] = [
 
 const TableComponent: FC = () => {
   const [originalUsers, setOriginalUsers] = useState<User[]>([]);
+  
 
   useEffect(() => {
     fetchAllUsers();
@@ -45,7 +46,7 @@ const TableComponent: FC = () => {
   };
   return (
     <>
-      <DetailsListUser originalUsers={originalUsers} serOriginalUsers={setOriginalUsers} fetchAllUsers={fetchAllUsers} />
+      <DetailsListUser originalUsers={originalUsers} fetchAllUsers={fetchAllUsers} />
     </>
   );
 };
