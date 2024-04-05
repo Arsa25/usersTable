@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react"
+import { FC, useState} from "react"
 import {
     DetailsList,
     IColumn,
@@ -12,14 +12,6 @@ import {
     IDetailsListStyles,
     IStackTokens,
     IStackStyles,
-    ComboBox,
-    SearchBox,
-    DefaultButton,
-    IComboBox,
-    IComboBoxOption,
-    SelectableOptionMenuItemType,
-    IComboBoxStyles,
-    ISearchBoxStyles
 } from "@fluentui/react";
 import EditUser from "../EditUser";
 import CreateUser from "../CreateUser";
@@ -34,21 +26,8 @@ type User = {
     city: string;
     address: string;
 };
-//comboBox
-const options: IComboBoxOption[] = [
-    {
-        key: "Header1",
-        text: "User types",
-        itemType: SelectableOptionMenuItemType.Header,
-    },
-    { key: "All", text: "All" },
-    { key: "A", text: "regular" },
-    { key: "B", text: "admin" },
-];
 //styles
 //searchBox
-const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 200, margin: "0 2px 0 10px " } };
-const comboBoxStyles: Partial<IComboBoxStyles> = { root: { width: 80 } };
 const stackStyles: IStackStyles = {
     root: {
         width: "100%",
@@ -96,30 +75,15 @@ const deleteButtonStyles: Partial<IButtonStyles> = {
 const deleteIcon: IIconProps = { iconName: "delete" };
 
 interface UserRenderProps {
-    originalUsers: User[]
+    filteredUsers: User[]
     fetchAllUsers: () => void
 }
-const DetailsListUser: FC<UserRenderProps> = ({ originalUsers,fetchAllUsers }) => {
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([])
-    const [searchValue, setSearchValue] = useState<string>("")
-    const [selectedOption, setSelectedOption] = useState<string>("All")
+const DetailsListUser: FC<UserRenderProps> = ({fetchAllUsers, filteredUsers}) => {
     const [checkedRowsId, setCheckedRowsId] = useState<string>("")
 
     const [isModalBtnVisible, setIsModalBtnVisible] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-
-   useEffect(() => {
-        setFilteredUsers(originalUsers)
-   },[originalUsers])
-
-    useEffect(() => {
-        if (selectedOption !== "All") {
-            setFilteredUsers(originalUsers.filter((user) => user.userType === selectedOption));
-        } else {
-            setFilteredUsers(originalUsers)
-        }
-    }, [selectedOption])
 
     const columns: IColumn[] = [
         {
@@ -233,7 +197,7 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers,fetchAllUsers }) =
         itemId === checkedRowsId ? setCheckedRowsId("") : setCheckedRowsId(itemId);
     };
     const renderCheckbox = (item: User) => {
-        const isDisabled = checkedRowsId !== undefined && checkedRowsId !== item.id;
+        const isDisabled = checkedRowsId !== "" && checkedRowsId !== item.id;
         return (
             <Checkbox
                 disabled={isDisabled}
@@ -245,75 +209,41 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers,fetchAllUsers }) =
     const hendleEditModal = (bool: boolean) => {
         setIsEditModalOpen(!bool)
     }
-    const searchUsers = (filteredUsers:User[]) => {
-        if (searchValue.trim() !== "") {
-            setFilteredUsers(filteredUsers.filter((user) =>
-                user.userType === selectedOption || selectedOption === "All" &&
-                user.name.toLowerCase().includes(searchValue.toLowerCase())
-            ))
-            
-        } else {
-            setFilteredUsers(originalUsers)
-        }
-    }
-
     return (
         <Stack>
-            <Stack horizontal>
-                <Stack horizontal >
-                    <ComboBox
-                        defaultSelectedKey="All"
-                        options={options}
-                        onItemClick={(
-                            event: React.FormEvent<IComboBox>,
-                            option?: IComboBoxOption,
-                            index?: number
-                        ) => {
-                            setSelectedOption(option?.text || "All");
-                        }}
-                        styles={comboBoxStyles}
-                    />
-                    <SearchBox
-                        styles={searchBoxStyles}
-                        placeholder="Search"
-                        value={searchValue}
-                        onChange={(event, newValue) => setSearchValue(newValue || "")}
-                    />
-                    < DefaultButton
-                        text="search"
-                        onClick={() => searchUsers(originalUsers)}
-                    />
-                </Stack>
-
-                <Stack horizontal tokens={containerStackTokens} styles={stackStyles}>
-                    {checkedRowsId !== undefined && checkedRowsId.length > 0 &&
-                        <PrimaryButton
-                            text="Delete"
-                            allowDisabledFocus
-                            iconProps={deleteIcon}
-                            styles={deleteButtonStyles}
-                            onClick={() => {
-                                setIsModalBtnVisible(true)
-                            }}
-                        />}
-                    {checkedRowsId !== undefined && checkedRowsId.length > 0 &&
-                        <PrimaryButton
-                            text="EDIT"
-                            styles={actionButtonStyle}
-                            onClick={() => hendleEditModal(false)}
-                            iconProps={editFriendIcon}
-                            allowDisabledFocus />
-                    }
+            //buttons
+            <Stack horizontal tokens={containerStackTokens} styles={stackStyles}>
+                {checkedRowsId !== undefined && checkedRowsId.length > 0 &&
                     <PrimaryButton
-                        text="CREATE USER"
-                        onClick={() => setIsCreateModalOpen(!isCreateModalOpen)}
-                        iconProps={addFriendIcon}
+                        text="Delete"
+                        allowDisabledFocus
+                        iconProps={deleteIcon}
+                        styles={deleteButtonStyles}
+                        onClick={() => {
+                            setIsModalBtnVisible(true)
+                        }}
+                    />}
+                {checkedRowsId !== undefined && checkedRowsId.length > 0 &&
+                    <PrimaryButton
+                        text="EDIT"
+                        styles={actionButtonStyle}
+                        onClick={() => hendleEditModal(false)}
+                        iconProps={editFriendIcon}
                         allowDisabledFocus />
-                </Stack>
+                }
+                <PrimaryButton
+                    text="CREATE USER"
+                    onClick={() => setIsCreateModalOpen(!isCreateModalOpen)}
+                    iconProps={addFriendIcon}
+                    allowDisabledFocus />
             </Stack>
+
+            //modals
             {isCreateModalOpen && <CreateUser hendleCreateModal={setIsCreateModalOpen} />}
-            {isEditModalOpen && <EditUser editPropsId={checkedRowsId} hendleEditModal={setIsEditModalOpen} />}
-            {isModalBtnVisible && <DeleteModalAlert setIsModalBtnVisible={setIsModalBtnVisible} checkedRowsId={checkedRowsId} fetchAllUsers={fetchAllUsers} />}
+            {(checkedRowsId && isEditModalOpen) && <EditUser editPropsId={checkedRowsId} hendleEditModal={setIsEditModalOpen} />}
+            {(checkedRowsId && isModalBtnVisible) && <DeleteModalAlert setIsModalBtnVisible={setIsModalBtnVisible} checkedRowsId={checkedRowsId} fetchAllUsers={fetchAllUsers} />}
+
+            //detailsList
             <Stack>
                 <DetailsList
                     items={filteredUsers}
@@ -325,5 +255,4 @@ const DetailsListUser: FC<UserRenderProps> = ({ originalUsers,fetchAllUsers }) =
         </Stack>
     )
 }
-
 export default DetailsListUser;
